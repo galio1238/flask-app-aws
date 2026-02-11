@@ -1,0 +1,23 @@
+<h2>User Profile</h2>
+<p>Username: {{ user[1] }}</p>
+<p>Name: {{ user[3] }} {{ user[4] }}</p>
+<p>Email: {{ user[5] }}</p>
+<p>Address: {{ user[6] }}</p>
+
+<h3>Upload a file</h3>
+<form method="POST" action="/upload/{{ user[1] }}" enctype="multipart/form-data">
+  <input type="file" name="file" accept=".txt" required>
+  <input type="submit" value="Upload file">
+</form>
+
+<h3>Or use the default Limerick.txt</h3>
+<form method="POST" action="/use_limerick/{{ user[1] }}">
+  <button type="submit">Use Limerick.txt (no upload)</button>
+</form>
+
+<p>Word Count: {{ user[7] }}</p>
+
+{% if user[8] %}
+  <a href="/download/{{ user[8] }}"><button>Download {{ user[8] }}</button></a>
+{% endif %}
+
