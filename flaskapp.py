@@ -71,6 +71,10 @@ def login():
         return redirect(url_for('profile', username=username))
     return "Invalid login"
 
+@app.route('/logout')
+def logout():
+    return redirect(url_for('login_page'))
+
 @app.route('/profile/<username>')
 def profile(username):
     conn = sqlite3.connect(DATABASE)
