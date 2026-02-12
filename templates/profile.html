@@ -1,23 +1,129 @@
-<h2>User Profile</h2>
-<p>Username: {{ user[1] }}</p>
-<p>Name: {{ user[3] }} {{ user[4] }}</p>
-<p>Email: {{ user[5] }}</p>
-<p>Address: {{ user[6] }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Flask App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">Flask App</a>
+            <div class="nav-links">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
 
-<h3>Upload a file</h3>
-<form method="POST" action="/upload/{{ user[1] }}" enctype="multipart/form-data">
-  <input type="file" name="file" accept=".txt" required>
-  <input type="submit" value="Upload file">
-</form>
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2>User Profile</h2>
+                <p style="color: #666; margin-top: 5px;">Welcome, {{ user[1] }}!</p>
+            </div>
 
-<h3>Or use the default Limerick.txt</h3>
-<form method="POST" action="/use_limerick/{{ user[1] }}">
-  <button type="submit">Use Limerick.txt (no upload)</button>
-</form>
+            {% if error %}
+            <div class="message message-error">{{ error }}</div>
+            {% endif %}
 
-<p>Word Count: {{ user[7] }}</p>
+            {% if message %}
+            <div class="message message-info">{{ message }}</div>
+            {% endif %}
 
-{% if user[8] %}
-  <a href="/download/{{ user[8] }}"><button>Download {{ user[8] }}</button></a>
-{% endif %}
+            {% if success %}
+            <div class="message message-success">{{ success }}</div>
+            {% endif %}
+
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ user[1] }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ user[5] }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">First Name</div>
+                    <div class="info-value">{{ user[3] }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Last Name</div>
+                    <div class="info-value">{{ user[4] }}</div>
+                </div>
+
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Address</div>
+                    <div class="info-value">{{ user[6] }}</div>
+                </div>
+            </div>
+
+            <div class="word-count">
+                <div class="word-count-label">Total Word Count (All Files)</div>
+                <div class="word-count-value">{{ total_wordcount }}</div>
+            </div>
+
+            <h3 class="section-header">File Management</h3>
+
+            <div class="upload-options">
+                <div class="upload-section">
+                    <h3>📤 Upload Your Own File</h3>
+                    <form method="POST" action="/upload/{{ user[1] }}" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input type="file" name="file" accept=".txt" required>
+                        </div>
+                        <input type="submit" value="Upload file">
+                    </form>
+                </div>
+
+                <div class="upload-section">
+                    <h3>📄 Use Default Limerick</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+                        Use the default Limerick.txt file without uploading
+                    </p>
+                    <form method="POST" action="/use_limerick/{{ user[1] }}">
+                        <button type="submit" class="btn-secondary">Use Limerick.txt</button>
+                    </form>
+                </div>
+            </div>
+
+            <h3 class="section-header">Your Files</h3>
+            {% if files %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; background: white;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 12px; text-align: left; color: #333;">Filename</th>
+                            <th style="padding: 12px; text-align: center; color: #333;">Word Count</th>
+                            <th style="padding: 12px; text-align: center; color: #333;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                            <td style="padding: 12px; color: #555;">{{ file[2] }}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 600; color: #667eea;">{{ file[4] }}</td>
+                            <td style="padding: 12px; text-align: center;">
+                                <a href="/download/{{ file[2] }}" style="display: inline-block; padding: 6px 16px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem;">
+                                    📥 Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #999; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                No files uploaded yet. Upload a file or use the default Limerick.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
 

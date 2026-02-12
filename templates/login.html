@@ -1,5 +1,58 @@
-<form method="POST" action="/login">
-Username:<input name="username"><br>
-Password:<input type="password" name="password"><br>
-<input type="submit" value="Login">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Flask App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">Flask App</a>
+            <div class="nav-links">
+                <a href="/register">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="card-title">Welcome Back</h1>
+            <p class="card-subtitle">Login to your account</p>
+
+            {% if error %}
+            <div class="message message-error">{{ error }}</div>
+            {% endif %}
+
+            {% if message %}
+            <div class="message message-info">{{ message }}</div>
+            {% endif %}
+
+            {% if success %}
+            <div class="message message-success">{{ success }}</div>
+            {% endif %}
+
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <input type="submit" value="Login">
+            </form>
+
+            <div class="divider">───────</div>
+
+            <p class="text-center">
+                Don't have an account? <a href="/register" class="link">Register here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

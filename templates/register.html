@@ -1,10 +1,78 @@
-<form method="POST" action="/register">
-Username:<input name="username"><br>
-Password:<input type="password" name="password"><br>
-First Name:<input name="firstname"><br>
-Last Name:<input name="lastname"><br>
-Email:<input name="email"><br>
-Address:<input name="address"><br>
-<input type="submit" value="Register">
-</form>
-<a href="/login">Login</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Flask App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">Flask App</a>
+            <div class="nav-links">
+                <a href="/login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="card-title">Create Account</h1>
+            <p class="card-subtitle">Join us today and get started</p>
+
+            {% if error %}
+            <div class="message message-error">{{ error }}</div>
+            {% endif %}
+
+            {% if message %}
+            <div class="message message-info">{{ message }}</div>
+            {% endif %}
+
+            {% if success %}
+            <div class="message message-success">{{ success }}</div>
+            {% endif %}
+
+            <form method="POST" action="/register">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="firstname">First Name</label>
+                    <input type="text" id="firstname" name="firstname" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastname">Last Name</label>
+                    <input type="text" id="lastname" name="lastname" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+
+                <input type="submit" value="Register">
+            </form>
+
+            <div class="divider">───────</div>
+
+            <p class="text-center">
+                Already have an account? <a href="/login" class="link">Login here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

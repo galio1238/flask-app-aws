@@ -15,15 +15,24 @@ DATABASE = '/var/www/flaskapp/users.db'
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
+    # Users table - stores user information
     c.execute('''CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         firstname TEXT,
         lastname TEXT,
         email TEXT,
-        address TEXT,
-        wordcount INTEGER
+        address TEXT
+    )''')
+    # Files table - stores file information with user ownership
+    c.execute('''CREATE TABLE IF NOT EXISTS files (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        filename TEXT NOT NULL,
+        filepath TEXT NOT NULL,
+        wordcount INTEGER DEFAULT 0,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )''')
     conn.commit()
     conn.close()
@@ -39,8 +48,8 @@ def register():
     data = request.form
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("INSERT INTO users (username,password,firstname,lastname,email,address,wordcount) VALUES (?,?,?,?,?,?,?)",
-              (data['username'], data['password'], data['firstname'], data['lastname'], data['email'], data['address'], 0))
+    c.execute("INSERT INTO users (username,password,firstname,lastname,email,address) VALUES (?,?,?,?,?,?)",
+              (data['username'], data['password'], data['firstname'], data['lastname'], data['email'], data['address']))
     conn.commit()
     conn.close()
     return redirect(url_for('profile', username=data['username']))
@@ -68,13 +77,22 @@ def profile(username):
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE username=?", (username,))
     user = c.fetchone()
+    
+    # Get all files owned by this user
+    c.execute("SELECT * FROM files WHERE user_id=?", (user[0],))
+    files = c.fetchall()
+    
+    # Calculate total word count from all files
+    total_wordcount = sum(f[4] for f in files) if files else 0
+    
     conn.close()
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, files=files, total_wordcount=total_wordcount)
 
 @app.route('/upload/<username>', methods=['POST'])
 def upload_file(username):
     file = request.files['file']
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
     with open(filepath, 'r') as f:
@@ -83,7 +101,15 @@ def upload_file(username):
 
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("UPDATE users SET wordcount=? WHERE username=?", (wordcount, username))
+    
+    # Get user id
+    c.execute("SELECT id FROM users WHERE username=?", (username,))
+    user_id = c.fetchone()[0]
+    
+    # Insert file record
+    c.execute("INSERT INTO files (user_id, filename, filepath, wordcount) VALUES (?,?,?,?)",
+              (user_id, filename, filepath, wordcount))
+    
     conn.commit()
     conn.close()
 
@@ -102,8 +128,15 @@ def use_limerick(username):
 
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("UPDATE users SET wordcount=?, uploaded_file=? WHERE username=?",
-              (wordcount, filename, username))
+    
+    # Get user id
+    c.execute("SELECT id FROM users WHERE username=?", (username,))
+    user_id = c.fetchone()[0]
+    
+    # Insert file record
+    c.execute("INSERT INTO files (user_id, filename, filepath, wordcount) VALUES (?,?,?,?)",
+              (user_id, filename, dest, wordcount))
+    
     conn.commit()
     conn.close()
 
